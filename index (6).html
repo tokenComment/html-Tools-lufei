@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 甜心二维码生成器</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff7eb9;
+            --secondary-color: #ffb6c1;
+            --accent-color: #ffd1dc;
+            --text-color: #333;
+            --light-text: #888;
+            --background-gradient: linear-gradient(135deg, #ffeef4 0%, #fff5f8 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(255, 126, 185, 0.15);
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 200px;
+            height: 200px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(255, 126, 185, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1::after {
+            content: '✨';
+            margin-left: 10px;
+        }
+
+        h1::before {
+            content: '✨';
+            margin-right: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 10;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 126, 185, 0.05);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 5px rgba(255, 126, 185, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 126, 185, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #ff6aa9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 126, 185, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #qrcode {
+            text-align: center;
+            margin-top: 40px;
+            min-height: 256px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255, 219, 230, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .download-btn {
+            display: none;
+            background: #7eb9ff;
+            box-shadow: 0 4px 15px rgba(126, 185, 255, 0.3);
+        }
+
+        .download-btn:hover {
+            background: #6aa9ff;
+            box-shadow: 0 6px 20px rgba(126, 185, 255, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--light-text);
+            font-size: 14px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 18px;
+            opacity: 0;
+            animation: floatHeart 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes floatHeart {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-50px) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>甜心二维码生成器</h1>
+        
+        <div class="input-group">
+            <input type="text" id="inputText" 
+                   placeholder="输入文字或URL，创建你的专属二维码..."
+                   autofocus>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="generateQR()">
+                <i class="fa fa-magic"></i> 生成二维码
+            </button>
+            <button class="download-btn" onclick="downloadQR()" 
+                    id="downloadBtn">
+                <i class="fa fa-download"></i> 下载二维码
+            </button>
+        </div>
+
+        <div id="qrcode"></div>
+    </div>
+
+    <div class="footer">
+        <p>💕 用二维码传递你的爱 | 所有内容仅在本地处理</p>
+    </div>
+<div class="footer">
+        <p>&copy; 2025 何江的未来希望工作室  二维码生成器 | 保护您的隐私，所有数据仅在本地处理</p>
+    </div>
+
+    <script>
+        let qrcode = null;
+        let currentQR = null;
+        let hearts = [];
+
+        // 创建漂浮爱心效果
+        function createHearts() {
+            const heartSymbols = ['💖', '💓', '💗', '💘', '💝'];
+            const container = document.querySelector('.container');
+            
+            // 清除旧的爱心
+            hearts.forEach(heart => heart.remove());
+            hearts = [];
+            
+            // 创建新的爱心
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDelay = `${Math.random() * 5}s`;
+                heart.style.animationDuration = `${5 + Math.random() * 10}s`;
+                container.appendChild(heart);
+                hearts.push(heart);
+            }
+        }
+
+        function generateQR() {
+            const text = document.getElementById('inputText').value.trim();
+            if (!text) {
+                shakeInput();
+                return;
+            }
+
+            // 清空之前的二维码
+            const container = document.getElementById('qrcode');
+            container.innerHTML = '';
+
+            // 创建新的二维码，添加生成动画
+            container.style.opacity = '0';
+            setTimeout(() => {
+                qrcode = new QRCode(container, {
+                    text: text,
+                    width: 256,
+                    height: 256,
+                    colorDark : "#ff7eb9",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                
+                // 显示下载按钮并添加出现动画
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.style.display = 'flex';
+                downloadBtn.style.opacity = '0';
+                downloadBtn.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    downloadBtn.style.opacity = '1';
+                    downloadBtn.style.transform = 'translateY(0)';
+                }, 100);
+                
+                // 二维码淡入
+                container.style.transition = 'opacity 0.5s ease';
+                container.style.opacity = '1';
+                
+                // 更新当前二维码引用
+                currentQR = container.getElementsByTagName('canvas')[0];
+                
+                // 创建爱心动画
+                createHearts();
+            }, 300);
+        }
+
+        function downloadQR() {
+            if (!currentQR) return;
+            
+            // 添加下载动画效果
+            currentQR.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                currentQR.style.transform = 'scale(1)';
+                
+                // 将canvas转为图片并下载
+                const url = currentQR.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.download = `sweet_qrcode_${Date.now()}.png`;
+                a.href = url;
+                document.body.appendChild(a);
+                
+                // 添加点击效果
+                a.style.position = 'fixed';
+                a.style.top = '-100px';
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                }, 100);
+            }, 200);
+        }
+
+        // 输入框抖动效果
+        function shakeInput() {
+            const input = document.getElementById('inputText');
+            input.classList.add('shake');
+            input.style.borderColor = 'red';
+            
+            setTimeout(() => {
+                input.classList.remove('shake');
+                input.style.borderColor = '';
+            }, 500);
+            
+            // 添加抖动动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+                .shake {
+                    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // 支持回车键生成
+        document.getElementById('inputText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') generateQR();
+        });
+
+        // 页面加载时创建初始爱心
+        window.addEventListener('load', createHearts);
+    </script>
+</body>
+</html>
+    
